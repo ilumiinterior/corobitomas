@@ -6,7 +6,7 @@ import vm from 'node:vm';
 test('Service worker installs all assets and serves the app and photos offline', async()=>{
   const handlers={}, stored=new Map(); let claimed=false;
   const cache={addAll:async assets=>{for(const asset of assets){const file=asset==='./'?'index.html':asset.slice(2);stored.set(asset,await readFile(file));}},match:async key=>stored.get(typeof key==='string'?key:key.url.replace('https://tomas.test/','./'))};
-  const caches={open:async()=>cache,keys:async()=>['tomas-v1'],match:cache.match,delete:async()=>true};
+  const caches={open:async()=>cache,keys:async()=>['tomas-v2','tomas-v3'],match:cache.match,delete:async()=>true};
   vm.runInNewContext(await readFile('sw.js','utf8'),{self:{addEventListener:(name,handler)=>handlers[name]=handler,skipWaiting:async()=>{},clients:{claim:async()=>{claimed=true;}},location:{origin:'https://tomas.test'}},caches,URL,fetch:async()=>{throw new Error('Offline');}});
   let pending;handlers.install({waitUntil:p=>pending=p});await pending;
   handlers.activate({waitUntil:p=>pending=p});await pending;assert.ok(claimed);

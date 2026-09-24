@@ -12,11 +12,11 @@ const calm = () => reduced || matchMedia('(prefers-reduced-motion: reduce)').mat
 const wheelZone = document.querySelector('.wheel-zone');
 const commentary = document.createElement('div');
 commentary.className = 'brain-commentary'; commentary.setAttribute('aria-hidden','true');
-commentary.innerHTML = '<span class="brain-label">V HLAVE PRÁVE PREBIEHA</span><strong>nič. absolútne nič.</strong>';
+commentary.innerHTML = '<span class="brain-label">ČO NA TO KOLESO?</span><strong>načítava sa…</strong>';
 wheelZone.append(commentary);
 const peanutGallery = document.createElement('div');
 peanutGallery.className = 'peanut-gallery'; peanutGallery.setAttribute('aria-hidden','true');
-peanutGallery.innerHTML = '<div class="spectator spectator-klara"><img src="./klara.jpg" alt=""><span>zdvihni mi 💅</span></div><div class="spectator spectator-jakub"><img src="./jakub.png" alt=""><span>bro sa načítava 💀</span></div>';
+peanutGallery.innerHTML = '<div class="spectator spectator-klara"><img src="./klara.jpg" alt=""><span>zase volá? 💅</span></div><div class="spectator spectator-jakub"><img src="./jakub.png" alt=""><span>ďalšie reelsko? 💀</span></div>';
 document.querySelector('.wheel-wrap').append(peanutGallery);
 const spinDock = document.createElement('div'); spinDock.className = 'spin-dock';
 $('spin').before(spinDock); spinDock.append($('spin'), document.querySelector('.under-button'));
@@ -47,7 +47,7 @@ function beep(frequency = 420, duration = .035, delay = 0) {
 function toast(message) { clearTimeout(toastTimeout); $('toast').textContent = message; $('toast').hidden = false; toastTimeout = setTimeout(() => $('toast').hidden = true, 3500); }
 function renderHistory() {
   $('history').replaceChildren(); $('history-count').textContent = `(${history.length})`; $('clear-history').hidden = history.length === 0; $('spin-number').textContent = `#${String(count).padStart(3, '0')}`;
-  if (!history.length) { const li = document.createElement('li'); li.className = 'empty-history'; li.textContent = 'Zatiaľ čistý register. Podozrivé. Roztoč prvé kolo. ↗'; $('history').append(li); }
+  if (!history.length) { const li = document.createElement('li'); li.className = 'empty-history'; li.textContent = 'Zatiaľ žiadna veštba. Roztoč koleso. ↗'; $('history').append(li); }
   history.forEach(item => { const option = outcomes[item.index], li = document.createElement('li'), emoji = document.createElement('span'), title = document.createElement('strong'), time = document.createElement('time'); emoji.className = 'history-emoji'; emoji.textContent = option.emoji; title.textContent = option.label; time.dateTime = new Date(item.time).toISOString(); time.textContent = new Date(item.time).toLocaleTimeString('sk-SK', { hour:'2-digit', minute:'2-digit' }); li.append(emoji,title,time); $('history').append(li); });
 }
 function celebrate() {
@@ -61,9 +61,9 @@ function celebrate() {
 }
 function reveal(index) {
   selected = index; const option = outcomes[index]; count++; history.unshift({ index, time: Date.now() }); history = history.slice(0,10); save('tomas-history',history); save('tomas-count',count);
-  $('result-title').textContent = option.label.toLocaleUpperCase('sk'); $('result-description').textContent = option.line; $('result-photo').src = `./${option.photo}`; $('result-photo').alt = option.photo.startsWith('klara') ? 'Klára' : option.photo.startsWith('jakub') ? 'Jakub' : 'Tomáš'; $('result-emoji').textContent = option.emoji; $('photo-caption').textContent = ['prichytený v 4K','zdroj: vesmír','absolútny cinema'][count%3]; $('result-kicker').textContent = 'VESMÍR ROZHODOL. BOHUŽIAĽ.';
-  $('result').classList.add('revealed', 'reveal-pop'); $('share').hidden = false; $('status').textContent = '● PRÍPAD VYRIEŠENÝ. ASI.'; $('spin-label').textContent = 'EŠTE JEDNU PIČOVINU'; $('spin').disabled = false; $('spin').removeAttribute('aria-busy'); document.body.classList.remove('spinning'); spinning = false; renderHistory(); celebrate(); [523,659,784,1047].forEach((f,i) => beep(f,.13,i*.11));
-  commentary.querySelector('strong').textContent = ['absolútny cinema.','bro má vlastný vesmír.','posledná bunka dala výpoveď.','toto nevymyslíš.'][count % 4];
+  $('result-title').textContent = option.label.toLocaleUpperCase('sk'); $('result-description').textContent = option.line; $('result-photo').src = `./${option.photo}`; $('result-photo').alt = option.photo.startsWith('klara') ? 'Klára' : option.photo.startsWith('jakub') ? 'Jakub' : 'Tomáš'; $('result-emoji').textContent = option.emoji; $('photo-caption').textContent = option.photo.startsWith('klara') ? 'Klára v zábere' : option.photo.startsWith('jakub') ? 'Jakub v zábere' : 'Tomáš v zábere'; $('result-kicker').textContent = 'KOLESO ROZHODLO. BEZ DÔKAZOV.';
+  $('result').classList.add('revealed', 'reveal-pop'); $('result').classList.toggle('long-result', option.label.length > 42); $('share').hidden = false; $('status').textContent = '● VEŠTBA JE NA SVETE.'; $('spin-label').textContent = 'EŠTE JEDNU PIČOVINU'; $('spin').disabled = false; $('spin').removeAttribute('aria-busy'); document.body.classList.remove('spinning'); spinning = false; renderHistory(); celebrate(); [523,659,784,1047].forEach((f,i) => beep(f,.13,i*.11));
+  commentary.querySelector('strong').textContent = ['Tomáš to môže poprieť.','koleso má jasno.','veštba je vonku.','toto si nevymyslíš.'][count % 4];
   verdict.textContent = index === 0 ? 'ZÁZRAK!' : index === 8 ? 'RIP 💀' : ['BRUH.','WTF?!','NO WAY','💀 💀 💀'][count % 4];
   document.body.classList.add('has-result');
   if (matchMedia('(max-width: 700px)').matches) $('result').scrollIntoView({behavior: calm() ? 'instant' : 'smooth', block:'center'});
@@ -71,17 +71,17 @@ function reveal(index) {
 function spin() {
   if (spinning) return; spinning = true; if(sound) initAudio();
   const index = randomIndex(), from = rotation, to = targetRotation(rotation,index), duration = reduced || matchMedia('(prefers-reduced-motion: reduce)').matches ? 200 : 5200, started = performance.now(); let lastTick = -1, phase = -1;
-  $('spin').disabled = true; $('spin').setAttribute('aria-busy','true'); $('spin-label').textContent = 'KONTAKTUJEM VESMÍR…'; $('share').hidden = true; $('result').classList.remove('reveal-pop'); document.body.classList.add('spinning'); $('status').textContent = '● PREBIEHA ABSOLÚTNE SERIÓZNY VÝSKUM.';
+  $('spin').disabled = true; $('spin').setAttribute('aria-busy','true'); $('spin-label').textContent = 'KOLESO SA TOČÍ…'; $('share').hidden = true; $('result').classList.remove('reveal-pop'); document.body.classList.add('spinning'); $('status').textContent = '● LOSOVANIE PREBIEHA.';
   if (matchMedia('(max-width: 700px)').matches) wheelZone.scrollIntoView({behavior: calm() ? 'instant' : 'smooth', block:'center'});
-  const messages = ['Skenujem poslednú mozgovú bunku…','Kontrolujem neprečítané reels…','Zákazník sa nebezpečne približuje…','Dobre. Toto bude bolieť.'];
-  function frame(now) { const t = Math.min(1,(now-started)/duration); rotation = from + (to-from)*(1-Math.pow(1-t,4)); $('wheel').style.transform = `rotate(${rotation}deg)`; const tick = Math.floor(rotation/30); if(tick!==lastTick){beep(280+Math.min(t*400,400));lastTick=tick;} const nextPhase = Math.min(3,Math.floor(t*4)); if(phase!==nextPhase){phase=nextPhase;$('result-kicker').textContent=messages[phase];commentary.querySelector('strong').textContent=['mozog.exe prestal pracovať','Klára píše… píše… píše…','NEOTÁČAJ SA. ZÁKAZNÍK.','posledná bunka ide ALL IN'][phase];document.querySelector('.hub span').textContent=['HELP 💀','404 MOZOG','BRO???','UŽ TO IDE'][phase];} if(t<1)requestAnimationFrame(frame);else{rotation=to%360;$('wheel').style.transform=`rotate(${rotation}deg)`;document.querySelector('.hub span').textContent='ON TO VIE?';reveal(index);} }
+  const messages = ['Tomášova posledná mozgová bunka čaká…','Prechádzam neprečítané reelska…','Zákazník sa nebezpečne približuje…','Koleso už skoro stojí…'];
+  function frame(now) { const t = Math.min(1,(now-started)/duration); rotation = from + (to-from)*(1-Math.pow(1-t,4)); $('wheel').style.transform = `rotate(${rotation}deg)`; const tick = Math.floor(rotation/30); if(tick!==lastTick){beep(280+Math.min(t*400,400));lastTick=tick;} const nextPhase = Math.min(3,Math.floor(t*4)); if(phase!==nextPhase){phase=nextPhase;$('result-kicker').textContent=messages[phase];commentary.querySelector('strong').textContent=['mozog.exe prestal pracovať','ešte jedno reelsko…','neotáčaj sa. zákazník.','posledná bunka rozhoduje'][phase];document.querySelector('.hub span').textContent=['HELP 💀','404 MOZOG','BRO???','UŽ TO IDE'][phase];} if(t<1)requestAnimationFrame(frame);else{rotation=to%360;$('wheel').style.transform=`rotate(${rotation}deg)`;document.querySelector('.hub span').textContent='ON TO VIE?';reveal(index);} }
   requestAnimationFrame(frame);
 }
 $('spin').addEventListener('click',spin);
 document.addEventListener('keydown', e => { if(e.code==='Space' && !e.repeat && !['BUTTON','INPUT','TEXTAREA','SELECT','SUMMARY','A'].includes(document.activeElement.tagName) && !$('install-dialog').open){e.preventDefault();spin();} });
 $('sound').addEventListener('click',()=>{sound=!sound;save('tomas-sound',sound);if(sound)initAudio();updateSettings();beep(660,.08);});
 $('motion').addEventListener('click',()=>{reduced=!reduced;save('tomas-motion',reduced);updateSettings();});
-$('clear-history').addEventListener('click',()=>{history=[];save('tomas-history',history);renderHistory();toast('Stopy zahladené. Tomáš je nevinný.');});
+$('clear-history').addEventListener('click',()=>{history=[];save('tomas-history',history);renderHistory();toast('História vymazaná. Začíname odznova.');});
 $('share').addEventListener('click',async()=>{
   if(selected===null)return; const text=`Čo robí Tomáš? ${outcomes[selected].emoji} ${outcomes[selected].label}. ${outcomes[selected].line}`, url=location.href.split('#')[0];
   try { if(navigator.share)await navigator.share({title:'Čo robí Tomáš?',text,url});else if(navigator.clipboard){await navigator.clipboard.writeText(`${text}\n${url}`);toast('Skopírované. Šír túto zbytočnú informáciu.');}else toast('Zdieľanie tu nefunguje. Skopíruj adresu stránky.'); } catch(e){if(e.name!=='AbortError')toast('Zdieľanie sa nepodarilo. Skús skopírovať adresu stránky.');}
@@ -90,6 +90,6 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installProm
 $('install').addEventListener('click',async()=>{if(installPrompt){await installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;}else if(matchMedia('(display-mode: standalone)').matches)toast('Tomáš už býva v tvojom mobile.');else $('install-dialog').showModal();});
 $('close-install').addEventListener('click',()=>$('install-dialog').close());
 window.addEventListener('appinstalled',()=>{installPrompt=null;toast('Tomáš sa úspešne nasťahoval.');});
-const network=()=>{$('offline-status').textContent=navigator.onLine?'MOZOG OFFLINE. APPKA ONLINE.':'BEZ NETU. PIČOVINY FUNGUJÚ ĎALEJ.';};window.addEventListener('online',network);window.addEventListener('offline',network);network();
+const network=()=>{$('offline-status').textContent=navigator.onLine?'FUNGUJE AJ BEZ INTERNETU.':'SI OFFLINE. KOLESO FUNGUJE ĎALEJ.';};window.addEventListener('online',network);window.addEventListener('offline',network);network();
 updateSettings();renderHistory();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});

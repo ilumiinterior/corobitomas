@@ -142,3 +142,55 @@ h1>span { transform: rotate(-3deg); text-shadow: 7px 7px 0 var(--ink); }
 }
 .reduced-motion .spectator, .reduced-motion .hub img, .reduced-motion .spin-arrow { animation: none !important; }
 @media (prefers-reduced-motion: reduce) { .spectator, .hub img, .spin-arrow { animation: none !important; } }
+/* Copy and legibility pass. The sticker must show both lines at every phone width. */
+.wheel-sticker {
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 124px;
+  height: 78px;
+  padding: 6px;
+  border: 3px solid var(--ink);
+  background: var(--pink);
+  color: var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  clip-path: none;
+  font: 900 22px/.95 var(--display);
+  white-space: nowrap;
+  transform: rotate(10deg);
+}
+.wheel-sticker span { display: block; }
+.wheel-sticker span:last-child { font-size: 20px; }
+.result.long-result h2 { clear: both; font-size: 40px; }
+@media (max-width: 700px) {
+  .chaos-label {
+    position: static;
+    display: inline-block;
+    margin: 0 0 13px 4px;
+    font-size: 10px;
+    transform: rotate(-3deg);
+  }
+  .wheel-sticker {
+    right: 0;
+    bottom: 83px;
+    width: 101px;
+    height: 62px;
+    padding: 5px;
+    font-size: 18px;
+  }
+  .wheel-sticker span:last-child { font-size: 16px; }
+  .status-line { font-size: 10px; line-height: 1.3; }
+  .result:not(.revealed) .result-kicker { font-size: 10px; }
+  .result:not(.revealed) p { font-size: 14px; }
+  .result.revealed h2 { overflow-wrap: anywhere; }
+  .result.revealed.long-result h2 { font-size: 34px; line-height: .97; }
+  .brain-label { font-size: 9px; letter-spacing: 1px; }
+  .tiny-note { font-size: 11px; }
+}
+@media (max-width: 360px) {
+  .wheel-sticker { right: -2px; bottom: 80px; }
+  .result.revealed.long-result h2 { font-size: 30px; }
+}
