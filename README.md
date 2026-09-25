@@ -1,6 +1,6 @@
 # Čo robí Tomáš?
 
-Slovenská meme PWA: 12 rovnako pravdepodobných výsledkov, animované koleso, tri pôvodné fotky, syntetické zvuky (predvolene vypnuté), konfety, história posledných 10 výsledkov a zdieľanie. Rešpektuje systémové obmedzenie pohybu a má vlastný prepínač animácií. Bez backendu, analytiky a runtime závislostí. História sa ukladá iba v prehliadači.
+Slovenská meme PWA: 13 rovnako pravdepodobných výsledkov, animované koleso, tri pôvodné fotky, syntetické zvuky (predvolene vypnuté), konfety, história posledných 10 výsledkov a zdieľanie. Rešpektuje systémové obmedzenie pohybu a má vlastný prepínač animácií. Bez backendu, analytiky a runtime závislostí. História sa ukladá iba v prehliadači.
 
 ## Spustenie
 
@@ -29,8 +29,11 @@ Inštalácia tlačidlom „Do mobilu“, prípadne cez menu prehliadača. iPhone
 
 - Možnosti, hlášky, fotky a farby: `data.js`.
 - Vzhľad: `style.css`.
-- Výraznejší meme vzhľad a mobilné rozloženie: `chaos.css`. Na mobile je tlačidlo pevne pri spodnom okraji; pri žrebovaní sa zobrazí koleso a potom výsledok. Animácie rešpektujú systémové obmedzenie pohybu.
 - Správanie: `app.js`.
 - App ikony: `icons/`, favicon: `icon.svg`.
 
 Ide o náhodný vtip, nie skutočné zisťovanie polohy alebo aktivity.
+
+## Farebné témy a rozhranie
+
+Nastavenia → Farebná téma: Citrón, Nočná šichta alebo Žuvačka. Voľba sa uloží v prehliadači a mení celú aplikáciu aj koleso. Históriu a všetky možnosti otvoríš pod kolesom. Bežiaci pás, nálepky, vedľajšie portréty a padajúce tváre boli odstránené, aby zostalo v centre koleso a výsledok.

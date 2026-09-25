@@ -1,4 +1,4 @@
-import { outcomes, colors, targetRotation, randomIndex } from './data.js';
+import { outcomes, palettes, segmentDegrees, segmentCenter, targetRotation, randomIndex } from './data.js';
 const $ = id => document.getElementById(id);
 const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
 const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} };
@@ -10,33 +10,24 @@ let reduced = read('tomas-motion', matchMedia('(prefers-reduced-motion: reduce)'
 let rotation = 0, spinning = false, selected = null, audio, installPrompt, toastTimeout;
 const calm = () => reduced || matchMedia('(prefers-reduced-motion: reduce)').matches;
 const wheelZone = document.querySelector('.wheel-zone');
-const commentary = document.createElement('div');
-commentary.className = 'brain-commentary'; commentary.setAttribute('aria-hidden','true');
-commentary.innerHTML = '<span class="brain-label">ČO NA TO KOLESO?</span><strong>načítava sa…</strong>';
-wheelZone.append(commentary);
-const peanutGallery = document.createElement('div');
-peanutGallery.className = 'peanut-gallery'; peanutGallery.setAttribute('aria-hidden','true');
-peanutGallery.innerHTML = '<div class="spectator spectator-klara"><img src="./klara.jpg" alt=""><span>zase volá? 💅</span></div><div class="spectator spectator-jakub"><img src="./jakub.png" alt=""><span>ďalšie reelsko? 💀</span></div>';
-document.querySelector('.wheel-wrap').append(peanutGallery);
-const spinDock = document.createElement('div'); spinDock.className = 'spin-dock';
-$('spin').before(spinDock); spinDock.append($('spin'), document.querySelector('.under-button'));
-$('install').setAttribute('aria-label','Nainštalovať aplikáciu do mobilu');
-const verdict = document.createElement('span'); verdict.className = 'verdict-sticker'; verdict.setAttribute('aria-hidden','true'); verdict.textContent = 'WTF?!'; $('result').append(verdict);
+let theme = read('tomas-theme', 'citron');
+if (!Object.hasOwn(palettes, theme)) theme = 'citron';
+let colors = palettes[theme].colors;
 const ns = 'http://www.w3.org/2000/svg';
 outcomes.forEach((option, i) => {
   const angle = Math.PI * 2 / outcomes.length, start = i * angle - Math.PI / 2, end = start + angle;
   const path = document.createElementNS(ns, 'path');
   path.setAttribute('d', `M300 300 L${300+297*Math.cos(start)} ${300+297*Math.sin(start)} A297 297 0 0 1 ${300+297*Math.cos(end)} ${300+297*Math.sin(end)} Z`);
-  path.setAttribute('fill', colors[i]); path.setAttribute('stroke', '#25221e'); path.setAttribute('stroke-width', '2'); $('wheel').append(path);
+  path.setAttribute('fill', colors[i % colors.length]); path.setAttribute('stroke', 'var(--wheel-ink)'); path.setAttribute('stroke-width', '2'); $('wheel').append(path);
   const text = document.createElementNS(ns, 'text');
-  text.setAttribute('transform', `translate(300 300) rotate(${i * 30 + 15 - 90})`);
+  text.setAttribute('transform', `translate(300 300) rotate(${segmentCenter(i) - 90})`);
   text.setAttribute('x', '272'); text.setAttribute('y', '6'); text.setAttribute('text-anchor', 'end');
-  text.setAttribute('fill', '#25221e'); text.setAttribute('font-family', 'Barlow Condensed, Impact, sans-serif'); text.setAttribute('font-size', '19'); text.setAttribute('font-weight', '800'); text.textContent = option.short; $('wheel').append(text);
+  text.setAttribute('fill', 'var(--wheel-ink)'); text.setAttribute('font-family', 'Barlow Condensed, Impact, sans-serif'); text.setAttribute('font-size', '19'); text.setAttribute('font-weight', '800'); text.textContent = option.short; $('wheel').append(text);
   const li = document.createElement('li'); li.textContent = `${option.emoji} ${option.label}`; $('options-list').append(li);
 });
 function updateSettings() {
   $('sound').setAttribute('aria-pressed', String(sound)); $('sound').setAttribute('aria-label', sound ? 'Vypnúť zvuk' : 'Zapnúť zvuk'); $('sound').title = sound ? 'Vypnúť zvuk' : 'Zapnúť zvuk'; $('sound').querySelector('span').textContent = `Zvuk: ${sound ? 'ON' : 'OFF'}`;
-  document.body.classList.toggle('reduced-motion', reduced); $('motion').setAttribute('aria-pressed', String(reduced)); $('motion').setAttribute('aria-label', reduced ? 'Zapnúť viac chaosu' : 'Obmedziť animácie'); $('motion').querySelector('span').textContent = reduced ? 'Viac chaosu' : 'Menej chaosu';
+  document.body.classList.toggle('reduced-motion', reduced); $('motion').setAttribute('aria-pressed', String(reduced)); $('motion').setAttribute('aria-label', reduced ? 'Zapnúť viac chaosu' : 'Obmedziť animácie'); $('motion').querySelector('span').textContent = reduced ? 'Animácie: vypnuté' : 'Animácie: zapnuté';
 }
 function initAudio() { try { audio ??= new (window.AudioContext || window.webkitAudioContext)(); audio.resume().catch(() => {}); } catch {} }
 function beep(frequency = 420, duration = .035, delay = 0) {
@@ -53,18 +44,13 @@ function renderHistory() {
 function celebrate() {
   if (reduced || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   $('confetti').replaceChildren();
-  for (let i = 0; i < 36; i++) { const bit = document.createElement('span'); bit.className = 'confetto'; bit.textContent = ['✦', '●', '💀', '✳', outcomes[selected].emoji][i%5]; bit.style.left = `${Math.random()*100}%`; bit.style.color = colors[i%colors.length]; bit.style.setProperty('--delay', `${Math.random()*.5}s`); bit.style.setProperty('--drift', `${Math.random()*240-120}px`); $('confetti').append(bit); }
+  for (let i = 0; i < 18; i++) { const bit = document.createElement('span'); bit.className = 'confetto'; bit.textContent = ['✦', '●', '💀', '✳', outcomes[selected].emoji][i%5]; bit.style.left = `${Math.random()*100}%`; bit.style.color = colors[i%colors.length]; bit.style.setProperty('--delay', `${Math.random()*.5}s`); bit.style.setProperty('--drift', `${Math.random()*240-120}px`); $('confetti').append(bit); }
   setTimeout(() => $('confetti').replaceChildren(), 3200);
-  for (let i = 0; i < 7; i++) {
-    const face = document.createElement('img'); face.className = 'confetto flying-face'; face.src = `./${i % 3 === 0 ? outcomes[selected].photo : 'tomas.jpeg'}`; face.alt = ''; face.style.left = `${8+Math.random()*78}%`; face.style.setProperty('--delay', `${i*.12}s`); face.style.setProperty('--drift', `${Math.random()*160-80}px`); $('confetti').append(face);
-  }
 }
 function reveal(index) {
   selected = index; const option = outcomes[index]; count++; history.unshift({ index, time: Date.now() }); history = history.slice(0,10); save('tomas-history',history); save('tomas-count',count);
   $('result-title').textContent = option.label.toLocaleUpperCase('sk'); $('result-description').textContent = option.line; $('result-photo').src = `./${option.photo}`; $('result-photo').alt = option.photo.startsWith('klara') ? 'Klára' : option.photo.startsWith('jakub') ? 'Jakub' : 'Tomáš'; $('result-emoji').textContent = option.emoji; $('photo-caption').textContent = option.photo.startsWith('klara') ? 'Klára v zábere' : option.photo.startsWith('jakub') ? 'Jakub v zábere' : 'Tomáš v zábere'; $('result-kicker').textContent = 'KOLESO ROZHODLO. BEZ DÔKAZOV.';
   $('result').classList.add('revealed', 'reveal-pop'); $('result').classList.toggle('long-result', option.label.length > 42); $('share').hidden = false; $('status').textContent = '● VEŠTBA JE NA SVETE.'; $('spin-label').textContent = 'EŠTE JEDNU PIČOVINU'; $('spin').disabled = false; $('spin').removeAttribute('aria-busy'); document.body.classList.remove('spinning'); spinning = false; renderHistory(); celebrate(); [523,659,784,1047].forEach((f,i) => beep(f,.13,i*.11));
-  commentary.querySelector('strong').textContent = ['Tomáš to môže poprieť.','koleso má jasno.','veštba je vonku.','toto si nevymyslíš.'][count % 4];
-  verdict.textContent = index === 0 ? 'ZÁZRAK!' : index === 8 ? 'RIP 💀' : ['BRUH.','WTF?!','NO WAY','💀 💀 💀'][count % 4];
   document.body.classList.add('has-result');
   if (matchMedia('(max-width: 700px)').matches) $('result').scrollIntoView({behavior: calm() ? 'instant' : 'smooth', block:'center'});
 }
@@ -74,7 +60,7 @@ function spin() {
   $('spin').disabled = true; $('spin').setAttribute('aria-busy','true'); $('spin-label').textContent = 'KOLESO SA TOČÍ…'; $('share').hidden = true; $('result').classList.remove('reveal-pop'); document.body.classList.add('spinning'); $('status').textContent = '● LOSOVANIE PREBIEHA.';
   if (matchMedia('(max-width: 700px)').matches) wheelZone.scrollIntoView({behavior: calm() ? 'instant' : 'smooth', block:'center'});
   const messages = ['Tomášova posledná mozgová bunka čaká…','Prechádzam neprečítané reelska…','Zákazník sa nebezpečne približuje…','Koleso už skoro stojí…'];
-  function frame(now) { const t = Math.min(1,(now-started)/duration); rotation = from + (to-from)*(1-Math.pow(1-t,4)); $('wheel').style.transform = `rotate(${rotation}deg)`; const tick = Math.floor(rotation/30); if(tick!==lastTick){beep(280+Math.min(t*400,400));lastTick=tick;} const nextPhase = Math.min(3,Math.floor(t*4)); if(phase!==nextPhase){phase=nextPhase;$('result-kicker').textContent=messages[phase];commentary.querySelector('strong').textContent=['mozog.exe prestal pracovať','ešte jedno reelsko…','neotáčaj sa. zákazník.','posledná bunka rozhoduje'][phase];document.querySelector('.hub span').textContent=['HELP 💀','404 MOZOG','BRO???','UŽ TO IDE'][phase];} if(t<1)requestAnimationFrame(frame);else{rotation=to%360;$('wheel').style.transform=`rotate(${rotation}deg)`;document.querySelector('.hub span').textContent='ON TO VIE?';reveal(index);} }
+  function frame(now) { const t = Math.min(1,(now-started)/duration); rotation = from + (to-from)*(1-Math.pow(1-t,4)); $('wheel').style.transform = `rotate(${rotation}deg)`; const tick = Math.floor(rotation/segmentDegrees); if(tick!==lastTick){beep(280+Math.min(t*400,400));lastTick=tick;} const nextPhase = Math.min(3,Math.floor(t*4)); if(phase!==nextPhase){phase=nextPhase;$('result-kicker').textContent=messages[phase];} if(t<1)requestAnimationFrame(frame);else{rotation=to%360;$('wheel').style.transform=`rotate(${rotation}deg)`;reveal(index);} }
   requestAnimationFrame(frame);
 }
 $('spin').addEventListener('click',spin);
@@ -91,5 +77,13 @@ $('install').addEventListener('click',async()=>{if(installPrompt){await installP
 $('close-install').addEventListener('click',()=>$('install-dialog').close());
 window.addEventListener('appinstalled',()=>{installPrompt=null;toast('Tomáš sa úspešne nasťahoval.');});
 const network=()=>{$('offline-status').textContent=navigator.onLine?'FUNGUJE AJ BEZ INTERNETU.':'SI OFFLINE. KOLESO FUNGUJE ĎALEJ.';};window.addEventListener('online',network);window.addEventListener('offline',network);network();
-updateSettings();renderHistory();
+function applyTheme() {
+  document.documentElement.dataset.theme = theme;
+  colors = palettes[theme].colors;
+  $('theme').value = theme;
+  document.querySelector('meta[name="theme-color"]').content = palettes[theme].chrome;
+  document.querySelectorAll('#wheel path').forEach((path, i) => path.setAttribute('fill', colors[i % colors.length]));
+}
+$('theme').addEventListener('change', () => { theme = $('theme').value; save('tomas-theme', theme); applyTheme(); });
+applyTheme();updateSettings();renderHistory();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
