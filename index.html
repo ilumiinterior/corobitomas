@@ -10,12 +10,14 @@
 <body>
   <header class="topbar">
     <a class="brand" href="./" aria-label="Čo robí Tomáš — domov">T?</a>
-    <details class="settings"><summary>Nastavenia <span aria-hidden="true">＋</span></summary><div class="settings-panel">
+    <button id="sound" class="sound-control" aria-pressed="true" aria-label="Vypnúť zvuk">♫ <span>Hudba ON</span></button>
+    <details class="settings"><summary><span class="settings-label">Nastavenia</span><span aria-hidden="true">⚙</span></summary><div class="settings-panel">
       <label for="theme">Farebná téma</label>
       <select id="theme"><option value="citron">Citrón — pôvodná</option><option value="noc">Nočná šichta — tmavá</option><option value="zuvacka">Žuvačka — ružová a mäta</option></select>
-      <button id="sound" class="tool" aria-pressed="false">♪ <span>Zvuk: OFF</span></button>
+
       <button id="motion" class="tool" aria-pressed="false">✳ <span>Animácie: zapnuté</span></button>
       <button id="install" class="tool">↙ Pridať do mobilu</button>
+      <p class="track-credit">Hrá: Martin Kittner – Čítam Ťa rád</p>
     </div></details>
   </header>
   <main>
@@ -40,6 +42,7 @@
     </div>
   </main>
   <footer><span>Vyrobené za účelom absolútne ničoho.</span><span id="offline-status">FUNGUJE AJ BEZ INTERNETU.</span></footer>
+  <audio id="music" src="./music/tomas-song.mp3" preload="auto" autoplay loop playsinline></audio>
   <div id="toast" role="status" hidden></div><div id="confetti" aria-hidden="true"></div>
   <dialog id="install-dialog"><button id="close-install" class="tool close-dialog" aria-label="Zavrieť">×</button><h2>TOMÁŠ DO VRECKA.</h2><p>V menu prehliadača vyber „Nainštalovať aplikáciu“ alebo „Pridať na plochu“. Na iPhone otvor stránku v Safari → Zdieľať → Pridať na plochu.</p><p>Po prvom načítaní funguje aj bez internetu.</p></dialog>
 </body></html>

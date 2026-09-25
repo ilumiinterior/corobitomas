@@ -5,9 +5,12 @@ const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(va
 let history = read('tomas-history', []);
 history = Array.isArray(history) ? history.filter(x => x && Number.isInteger(x.index) && outcomes[x.index] && Number.isFinite(x.time)).slice(0, 10) : [];
 let count = read('tomas-count', 0); if (!Number.isSafeInteger(count) || count < 0) count = 0;
-let sound = read('tomas-sound', false) === true;
+let sound = read('tomas-sound', true) === true;
 let reduced = read('tomas-motion', matchMedia('(prefers-reduced-motion: reduce)').matches) === true;
 let rotation = 0, spinning = false, selected = null, audio, installPrompt, toastTimeout;
+const music = $('music');
+music.volume = 0.65;
+let musicBlocked = false;
 const calm = () => reduced || matchMedia('(prefers-reduced-motion: reduce)').matches;
 const wheelZone = document.querySelector('.wheel-zone');
 let theme = read('tomas-theme', 'citron');
@@ -26,8 +29,17 @@ outcomes.forEach((option, i) => {
   const li = document.createElement('li'); li.textContent = `${option.emoji} ${option.label}`; $('options-list').append(li);
 });
 function updateSettings() {
-  $('sound').setAttribute('aria-pressed', String(sound)); $('sound').setAttribute('aria-label', sound ? 'Vypnúť zvuk' : 'Zapnúť zvuk'); $('sound').title = sound ? 'Vypnúť zvuk' : 'Zapnúť zvuk'; $('sound').querySelector('span').textContent = `Zvuk: ${sound ? 'ON' : 'OFF'}`;
+  const playing = sound && !music.paused;
+  $('sound').setAttribute('aria-pressed', String(playing));
+  $('sound').setAttribute('aria-label', playing ? 'Vypnúť zvuk' : musicBlocked && sound ? 'Spustiť hudbu' : 'Zapnúť zvuk');
+  $('sound').querySelector('span').textContent = playing ? 'Hudba ON' : musicBlocked && sound ? 'Pustiť hudbu' : 'Zvuk OFF';
   document.body.classList.toggle('reduced-motion', reduced); $('motion').setAttribute('aria-pressed', String(reduced)); $('motion').setAttribute('aria-label', reduced ? 'Zapnúť viac chaosu' : 'Obmedziť animácie'); $('motion').querySelector('span').textContent = reduced ? 'Animácie: vypnuté' : 'Animácie: zapnuté';
+}
+async function playMusic() {
+  if (!sound) return;
+  try { await music.play(); musicBlocked = false; }
+  catch { musicBlocked = true; }
+  updateSettings();
 }
 function initAudio() { try { audio ??= new (window.AudioContext || window.webkitAudioContext)(); audio.resume().catch(() => {}); } catch {} }
 function beep(frequency = 420, duration = .035, delay = 0) {
@@ -65,7 +77,18 @@ function spin() {
 }
 $('spin').addEventListener('click',spin);
 document.addEventListener('keydown', e => { if(e.code==='Space' && !e.repeat && !['BUTTON','INPUT','TEXTAREA','SELECT','SUMMARY','A'].includes(document.activeElement.tagName) && !$('install-dialog').open){e.preventDefault();spin();} });
-$('sound').addEventListener('click',()=>{sound=!sound;save('tomas-sound',sound);if(sound)initAudio();updateSettings();beep(660,.08);});
+$('sound').addEventListener('click',()=>{
+  if (musicBlocked && sound) { playMusic(); return; }
+  sound = !sound; save('tomas-sound',sound);
+  if (sound) { initAudio(); playMusic(); }
+  else { music.pause(); musicBlocked = false; updateSettings(); }
+});
+function resumeMusicOnGesture(event) {
+  if (!sound || !music.paused || event.target.closest?.('#sound')) return;
+  playMusic();
+}
+document.addEventListener('pointerdown', resumeMusicOnGesture, {capture:true});
+document.addEventListener('keydown', resumeMusicOnGesture, {capture:true});
 $('motion').addEventListener('click',()=>{reduced=!reduced;save('tomas-motion',reduced);updateSettings();});
 $('clear-history').addEventListener('click',()=>{history=[];save('tomas-history',history);renderHistory();toast('História vymazaná. Začíname odznova.');});
 $('share').addEventListener('click',async()=>{
@@ -86,4 +109,5 @@ function applyTheme() {
 }
 $('theme').addEventListener('change', () => { theme = $('theme').value; save('tomas-theme', theme); applyTheme(); });
 applyTheme();updateSettings();renderHistory();
+if (sound) playMusic();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});

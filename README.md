@@ -1,6 +1,6 @@
 # Čo robí Tomáš?
 
-Slovenská meme PWA: 13 rovnako pravdepodobných výsledkov, animované koleso, tri pôvodné fotky, syntetické zvuky (predvolene vypnuté), konfety, história posledných 10 výsledkov a zdieľanie. Rešpektuje systémové obmedzenie pohybu a má vlastný prepínač animácií. Bez backendu, analytiky a runtime závislostí. História sa ukladá iba v prehliadači.
+Slovenská meme PWA: 13 rovnako pravdepodobných výsledkov, animované koleso, tri pôvodné fotky, hudba na pozadí (predvolene zapnutá) a syntetické zvuky, konfety, história posledných 10 výsledkov a zdieľanie. Rešpektuje systémové obmedzenie pohybu a má vlastný prepínač animácií. Bez backendu, analytiky a runtime závislostí. História sa ukladá iba v prehliadači.
 
 ## Spustenie
 
@@ -21,9 +21,13 @@ npm run build
 
 Nahraj celý projekt do GitHub repozitára (vrátane fotiek a priečinka `icons`). Vo Verceli importuj repozitár. Framework preset: **Other**, build: `npm run build`, output: `dist`. Konfiguráciu obsahuje `vercel.json`; nie sú potrebné premenné prostredia ani databáza. Priečinok `dist` sa generuje pri builde a nepatrí do Gitu.
 
+## Hudba
+
+Skladba `music/tomas-song.mp3` sa prehráva v slučke. Zvuk je predvolene zapnutý a prepínač v hornej lište ovláda hudbu aj zvuky kolesa. Prehliadače môžu zablokovať automatické prehrávanie so zvukom; vtedy sa v lište zobrazí „Pustiť hudbu“ a skladba sa spustí pri prvom ťuknutí. Nastavenie zvuku sa ukladá v prehliadači. MP3 sa ukladá aj do offline cache.
+
 ## PWA
 
-Inštalácia tlačidlom „Do mobilu“, prípadne cez menu prehliadača. iPhone: Safari → Zdieľať → Pridať na plochu. Vyžaduje HTTPS (na localhost funguje aj HTTP). Po prvom úspešnom načítaní sa aplikácia uloží do offline cache. Pri ďalšej verzii zmeň `CACHE` v `sw.js`, aby sa obnovili súbory. Google Fonts sú voliteľné; bez internetu fungujú lokálne záložné fonty.
+Inštalácia cez Nastavenia → Pridať do mobilu, prípadne cez menu prehliadača. iPhone: Safari → Zdieľať → Pridať na plochu. Vyžaduje HTTPS (na localhost funguje aj HTTP). Po prvom úspešnom načítaní sa aplikácia uloží do offline cache. Pri ďalšej verzii zmeň `CACHE` v `sw.js`, aby sa obnovili súbory. Google Fonts sú voliteľné; bez internetu fungujú lokálne záložné fonty.
 
 ## Úpravy
 
